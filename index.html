@@ -3,34 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rohan's Smart Tools</title>
+    <title>DevRohan Smart Tools</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; text-align: center; padding: 20px; }
-        .tool-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: 20px auto; }
-        textarea { width: 90%; height: 100px; border: 1px solid #ccc; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
-        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        .res { font-weight: bold; margin-top: 10px; color: #2ecc71; font-size: 18px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; text-align: center; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; border-top: 5px solid #007bff; }
+        textarea, input { width: 90%; padding: 10px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 8px; }
+        button { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        .res { font-weight: bold; margin-top: 15px; color: #28a745; font-size: 18px; }
+        h1 { color: #2c3e50; }
     </style>
 </head>
 <body>
-    <h1>🚀 DevRohan Smart Tools</h1>
-    <div class="tool-card">
-        <h3>Word Counter</h3>
-        <textarea id="inp" placeholder="Kuch bhi type karein..."></textarea>
-        <div id="wCount" class="res">Words: 0</div>
+    <h1>🚀 DevRohan Pro Tools</h1>
+
+    <div class="card">
+        <h3>📝 Advanced Word Counter</h3>
+        <textarea id="inp" placeholder="Kuch bhi type ya paste karein..." oninput="count()"></textarea>
+        <div id="wCount" class="res">Words: 0 | Chars: 0</div>
     </div>
-    <div class="tool-card">
-        <h3>Password Generator</h3>
-        <button onclick="gen()">Generate Now</button>
-        <div id="pRes" class="res"></div>
+
+    <div class="card">
+        <h3>🎂 Age Calculator</h3>
+        <input type="date" id="dob">
+        <button onclick="calcAge()">Check Age</button>
+        <div id="ageRes" class="res"></div>
     </div>
+
+    <div class="card">
+        <h3>🔐 Secure Password</h3>
+        <button onclick="gen()">Generate Strong Password</button>
+        <div id="pRes" class="res" style="color: #e67e22; letter-spacing: 2px;"></div>
+    </div>
+
     <script>
-        document.getElementById('inp').addEventListener('input', function(){
-            let words = this.value.trim().split(/\s+/).filter(x => x).length;
-            document.getElementById('wordRes').innerText = "Total Words: " + words;
-        });
+        function count() {
+            let val = document.getElementById('inp').value.trim();
+            let words = val ? val.split(/\s+/).length : 0;
+            let chars = val.length;
+            document.getElementById('wCount').innerText = "Words: " + words + " | Chars: " + chars;
+        }
+
+        function calcAge() {
+            let birth = new Date(document.getElementById('dob').value);
+            if(isNaN(birth)) return;
+            let diff = Date.now() - birth.getTime();
+            let age = new Date(diff).getUTCFullYear() - 1970;
+            document.getElementById('ageRes').innerText = "Aapki Age: " + age + " Saal";
+        }
+
         function gen() {
-            let pass = Math.random().toString(36).slice(-10);
+            let chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$";
+            let pass = "";
+            for(let i=0; i<10; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
             document.getElementById('pRes').innerText = pass;
         }
     </script>
