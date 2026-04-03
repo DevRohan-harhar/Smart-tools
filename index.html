@@ -3,21 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevRohan Smart Tools</title>
+    <title>DevRohan Pro Tools</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; text-align: center; padding: 20px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; border-top: 5px solid #007bff; }
-        textarea, input, select { width: 95%; padding: 12px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; margin-top: 5px; }
-        button:hover { background: #0056b3; }
-        .res { font-weight: bold; margin-top: 15px; color: #28a745; font-size: 16px; word-wrap: break-word; }
-        h1 { color: #2c3e50; margin-bottom: 30px; }
+        /* Modern UI & Dark Mode Variables */
+        :root { --bg: #f8fafc; --card: white; --text: #1e293b; --primary: #2563eb; --border: #e2e8f0; }
+        .dark-mode { --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --primary: #3b82f6; --border: #334155; }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); text-align: center; padding: 20px; transition: 0.3s; margin: 0; }
+        .card { background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); max-width: 450px; margin: 20px auto; border: 1px solid var(--border); }
+        
+        textarea, input, select { width: 95%; padding: 12px; margin: 10px 0; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        
+        /* Life Progress Bar Styling */
+        .progress-container { background: #e2e8f0; border-radius: 10px; height: 25px; margin-top: 15px; overflow: hidden; position: relative; }
+        .progress-bar { background: linear-gradient(90deg, #22c55e, #16a34a); height: 100%; width: 0%; transition: 1.5s ease-in-out; }
+        
+        .toggle-btn { position: fixed; top: 15px; right: 15px; padding: 8px 15px; border-radius: 20px; background: var(--primary); color: white; border: none; font-size: 14px; cursor: pointer; z-index: 100; }
+        .res { font-weight: bold; margin-top: 15px; color: #22c55e; }
         canvas { display: none; }
     </style>
 </head>
 <body>
 
-    <h1>🚀 DevRohan Smart Tools</h1>
+    <button class="toggle-btn" onclick="document.body.classList.toggle('dark-mode')">🌓 Dark Mode</button>
+
+    <h1 style="margin-top: 40px;">🚀 DevRohan Smart Hub</h1>
+
+    <div class="card" style="border-top: 5px solid #ef4444;">
+        <h3>⏳ Life Reality Check</h3>
+        <p style="font-size: 13px; opacity: 0.8;">Apni Date of Birth select karein</p>
+        <input type="date" id="lifeDob" onchange="updateLifeProgress()">
+        <div class="progress-container">
+            <div id="lifeFill" class="progress-bar"></div>
+        </div>
+        <p id="lifeStat" style="margin-top: 10px; font-weight: bold; font-size: 18px;"></p>
+        <p style="font-size: 11px; opacity: 0.6;">(Based on 80 years average life span)</p>
+    </div>
 
     <div class="card">
         <h3>📝 Word Counter</h3>
@@ -25,47 +47,60 @@
         <div id="wCount" class="res">Words: 0 | Chars: 0</div>
     </div>
 
-    <div class="card" style="border-top-color: #9b59b6;">
+    <div class="card" style="border-top: 5px solid #9b59b6;">
         <h3>🎂 Age Calculator</h3>
         <input type="date" id="dob">
         <button onclick="doAge()">Calculate Age</button>
-        <div id="ageRes" class="res" style="display:none;"></div>
+        <div id="ageRes" class="res"></div>
     </div>
 
-    <div class="card" style="border-top-color: #e67e22;">
+    <div class="card" style="border-top: 5px solid #e67e22;">
         <h3>🖼️ Image Resizer</h3>
-        <p style="font-size: 12px; color: #666;">Photo select karein aur Size chunein</p>
         <input type="file" id="imgInp" accept="image/*">
-        
         <select id="sizeSelect">
             <option value="1280">YouTube Thumbnail (1280px)</option>
             <option value="1080">Instagram Post (1080px)</option>
             <option value="500">Medium Size (500px)</option>
-            <option value="300">Passport Size / Small (300px)</option>
-            <option value="150">Thumbnail Small (150px)</option>
+            <option value="300">Passport Size (300px)</option>
         </select>
-
         <button onclick="resizeImg()">Resize & Download</button>
         <canvas id="canvas"></canvas>
     </div>
 
     <script>
+        // 1. Life Progress Logic
+        function updateLifeProgress() {
+            const dob = new Date(document.getElementById('lifeDob').value);
+            const today = new Date();
+            if(isNaN(dob)) return;
+
+            const diffTime = Math.abs(today - dob);
+            const daysLived = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const totalDaysIn80Years = 80 * 365.25;
+            
+            let percent = ((daysLived / totalDaysIn80Years) * 100).toFixed(2);
+            if(percent > 100) percent = 100;
+
+            document.getElementById('lifeFill').style.width = percent + "%";
+            document.getElementById('lifeStat').innerText = percent + "% Life Complete";
+        }
+
+        // 2. Word Counter Logic
         function count() {
             let val = document.getElementById('inp').value.trim();
             let words = val ? val.split(/\s+/).length : 0;
             document.getElementById('wCount').innerText = "Words: " + words + " | Chars: " + val.length;
         }
 
+        // 3. Age Calculator Logic
         function doAge() {
             let d = new Date(document.getElementById('dob').value);
             if(isNaN(d)) return;
-            let diff = new Date() - d;
-            let age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-            let res = document.getElementById('ageRes');
-            res.style.display = "block";
-            res.innerText = "Aapki Umra: " + age + " Saal";
+            let age = Math.floor((new Date() - d) / (1000 * 60 * 60 * 24 * 365.25));
+            document.getElementById('ageRes').innerText = "Aap " + age + " saal ke hain!";
         }
 
+        // 4. Image Resizer Logic
         function resizeImg() {
             const file = document.getElementById('imgInp').files[0];
             const width = parseInt(document.getElementById('sizeSelect').value);
