@@ -5,57 +5,87 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DevRohan Smart Tools</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; text-align: center; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; text-align: center; padding: 20px; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; border-top: 5px solid #007bff; }
-        textarea, input { width: 90%; padding: 10px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 8px; }
-        button { background: #007bff; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
-        .res { font-weight: bold; margin-top: 15px; color: #28a745; font-size: 18px; }
-        h1 { color: #2c3e50; }
+        textarea, input { width: 90%; padding: 12px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; margin-top: 5px; }
+        button:hover { background: #0056b3; }
+        .res { font-weight: bold; margin-top: 15px; color: #28a745; font-size: 16px; word-wrap: break-word; }
+        h1 { color: #2c3e50; margin-bottom: 30px; }
+        h3 { margin-top: 0; color: #333; }
+        canvas { display: none; }
     </style>
 </head>
 <body>
-    <h1>🚀 DevRohan Pro Tools</h1>
+
+    <h1>🚀 DevRohan Smart Tools</h1>
 
     <div class="card">
-        <h3>📝 Advanced Word Counter</h3>
-        <textarea id="inp" placeholder="Kuch bhi type ya paste karein..." oninput="count()"></textarea>
+        <h3>📝 Word Counter</h3>
+        <textarea id="inp" placeholder="Kuch bhi type karein..." oninput="count()"></textarea>
         <div id="wCount" class="res">Words: 0 | Chars: 0</div>
     </div>
 
-    <div class="card">
+    <div class="card" style="border-top-color: #9b59b6;">
         <h3>🎂 Age Calculator</h3>
         <input type="date" id="dob">
-        <button onclick="calcAge()">Check Age</button>
-        <div id="ageRes" class="res"></div>
+        <button onclick="doAge()">Calculate Age</button>
+        <div id="ageRes" class="res" style="display:none;"></div>
     </div>
 
-    <div class="card">
-        <h3>🔐 Secure Password</h3>
-        <button onclick="gen()">Generate Strong Password</button>
-        <div id="pRes" class="res" style="color: #e67e22; letter-spacing: 2px;"></div>
+    <div class="card" style="border-top-color: #e67e22;">
+        <h3>🖼️ Image Resizer</h3>
+        <p style="font-size: 12px; color: #666;">Photo select karein aur Width (pixels) dalein</p>
+        <input type="file" id="imgInp" accept="image/*">
+        <input type="number" id="wInp" placeholder="New Width (e.g. 500)">
+        <button onclick="resizeImg()">Resize & Download</button>
+        <canvas id="canvas"></canvas>
     </div>
 
     <script>
+        // Word Counter Logic
         function count() {
             let val = document.getElementById('inp').value.trim();
             let words = val ? val.split(/\s+/).length : 0;
-            let chars = val.length;
-            document.getElementById('wCount').innerText = "Words: " + words + " | Chars: " + chars;
+            document.getElementById('wCount').innerText = "Words: " + words + " | Chars: " + val.length;
         }
 
-        function calcAge() {
-            let birth = new Date(document.getElementById('dob').value);
-            if(isNaN(birth)) return;
-            let diff = Date.now() - birth.getTime();
-            let age = new Date(diff).getUTCFullYear() - 1970;
-            document.getElementById('ageRes').innerText = "Aapki Age: " + age + " Saal";
+        // Age Calculator Logic
+        function doAge() {
+            let d = new Date(document.getElementById('dob').value);
+            if(isNaN(d)) return;
+            let diff = new Date() - d;
+            let age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+            let res = document.getElementById('ageRes');
+            res.style.display = "block";
+            res.innerText = "Aapki Umra: " + age + " Saal";
         }
 
-        function gen() {
-            let chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$";
-            let pass = "";
-            for(let i=0; i<10; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
-            document.getElementById('pRes').innerText = pass;
+        // Image Resizer Logic
+        function resizeImg() {
+            const file = document.getElementById('imgInp').files[0];
+            const width = parseInt(document.getElementById('wInp').value);
+            if(!file || !width) { alert("File aur Width dono bhariye"); return; }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const scale = width / img.width;
+                    canvas.width = width;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const link = document.createElement('a');
+                    link.download = 'resized-image.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                }
+            }
+            reader.readAsDataURL(file);
         }
     </script>
 </body>
