@@ -7,12 +7,11 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; text-align: center; padding: 20px; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; border-top: 5px solid #007bff; }
-        textarea, input { width: 90%; padding: 12px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        textarea, input, select { width: 95%; padding: 12px; margin: 10px 0; border: 1.5px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
         button { background: #007bff; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; margin-top: 5px; }
         button:hover { background: #0056b3; }
         .res { font-weight: bold; margin-top: 15px; color: #28a745; font-size: 16px; word-wrap: break-word; }
         h1 { color: #2c3e50; margin-bottom: 30px; }
-        h3 { margin-top: 0; color: #333; }
         canvas { display: none; }
     </style>
 </head>
@@ -35,22 +34,28 @@
 
     <div class="card" style="border-top-color: #e67e22;">
         <h3>🖼️ Image Resizer</h3>
-        <p style="font-size: 12px; color: #666;">Photo select karein aur Width (pixels) dalein</p>
+        <p style="font-size: 12px; color: #666;">Photo select karein aur Size chunein</p>
         <input type="file" id="imgInp" accept="image/*">
-        <input type="number" id="wInp" placeholder="New Width (e.g. 500)">
+        
+        <select id="sizeSelect">
+            <option value="1280">YouTube Thumbnail (1280px)</option>
+            <option value="1080">Instagram Post (1080px)</option>
+            <option value="500">Medium Size (500px)</option>
+            <option value="300">Passport Size / Small (300px)</option>
+            <option value="150">Thumbnail Small (150px)</option>
+        </select>
+
         <button onclick="resizeImg()">Resize & Download</button>
         <canvas id="canvas"></canvas>
     </div>
 
     <script>
-        // Word Counter Logic
         function count() {
             let val = document.getElementById('inp').value.trim();
             let words = val ? val.split(/\s+/).length : 0;
             document.getElementById('wCount').innerText = "Words: " + words + " | Chars: " + val.length;
         }
 
-        // Age Calculator Logic
         function doAge() {
             let d = new Date(document.getElementById('dob').value);
             if(isNaN(d)) return;
@@ -61,11 +66,10 @@
             res.innerText = "Aapki Umra: " + age + " Saal";
         }
 
-        // Image Resizer Logic
         function resizeImg() {
             const file = document.getElementById('imgInp').files[0];
-            const width = parseInt(document.getElementById('wInp').value);
-            if(!file || !width) { alert("File aur Width dono bhariye"); return; }
+            const width = parseInt(document.getElementById('sizeSelect').value);
+            if(!file) { alert("Pehle photo select karein"); return; }
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -80,7 +84,7 @@
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                     
                     const link = document.createElement('a');
-                    link.download = 'resized-image.png';
+                    link.download = 'devrohan-resized.png';
                     link.href = canvas.toDataURL();
                     link.click();
                 }
